@@ -99,12 +99,21 @@ class AddressBook(UserDict):
     def get_upcoming_birthdays(self):
         today = datetime.today()
         upcoming = []
+        
         for record in self.data.values():
             if record.birthday:
                 birthday = record.birthday.value
-                # Перевірка, чи день народження наступного тижня
-                if today <= birthday <= today + timedelta(days=7):
+                # Перевірка, чи вже минув день народження цього року
+                birthday_this_year = birthday.replace(year=today.year)
+
+                # Якщо день народження вже минув в цьому році, розглядаємо наступний рік
+                if birthday_this_year < today:
+                    birthday_this_year = birthday_this_year.replace(year=today.year + 1)
+                
+                # Перевірка, чи день народження в межах наступного тижня
+                if today <= birthday_this_year <= today + timedelta(days=7):
                     upcoming.append(record)
+        
         return upcoming
 
 # Декоратор для обробки помилок
